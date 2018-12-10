@@ -1,6 +1,3 @@
-/*
-LCD setup - https://www.arduino.cc/en/Tutorial/HelloWorld
-*/
 // This is the code to run a greenhouse sensor - an Arduino Uno connected to a temperature & humidity, and soil moisture, sensor, displays their readings on an OLED screen, and uploads an average every minute to a ThingSpeak channel which triggers an email notification if readings are outside of desired parameters.
 
 #include <dht.h> //needed for temp & humid sensor
@@ -86,7 +83,7 @@ void loop() {
     } while( u8g.nextPage() );
     readings++;
   }
-  delay(2000); //take a reading every second
+  delay(2000); //take a reading every 2 seconds
 
   if (readings == 30) { //after 60 seconds (30 readings), do an average of each reading over that time, and send to thingspeak
     moistAv = moistTot / readings;
@@ -106,7 +103,7 @@ void loop() {
     }
     // Update ThingSpeak
     if (!client.connected() && (millis() - lastConnectionTime > updateThingSpeakInterval)) {
-      updateThingSpeak("field1=" + moistStr + "&field2=" + tempStr + "&field3=" + humidStr);
+      updateThingSpeak("field1=" + moistStr + "&field2=" + tempStr + "&field3=" + humidStr); //the actual insertion of data
     }
     lastConnected = client.connected();
     readings = 0; //reset the totals to 0 so new totals can be calculated after the next minute of readings
@@ -133,7 +130,7 @@ void draw() {
   u8g.drawStr(120, 60, "% ");
 }
 
-void updateThingSpeak(String tsData) {
+void updateThingSpeak(String tsData) { //in-depth code for connecting to thingspeak's server
   if (client.connect(thingSpeakAddress, 80)) {
     client.print("POST /update HTTP/1.1\n");
     client.print("Host: api.thingspeak.com\n");
